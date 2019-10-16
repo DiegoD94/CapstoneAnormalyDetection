@@ -1,13 +1,26 @@
+"""
+module for generating data for time series anomaly detection
+the code is for capstone project in Data Science Institute, 2019
+author: zhuzilin, zhuzilinallen@gmail.com
+"""
 import random
 import inspect
 from collections import deque
 
-"""
-func: statistic function
-params: function to get the params of func at time t
-"""
+
 class StatFunc:
+    """
+    Class for random variable with parameter that may vary through time
+    """
     def __init__(self, func, params):
+        """
+        initiate the random variable
+        
+        params
+        func - a random function, e.g. random.gauss
+        params - a dictionary of function or constant that corresponds to func
+                 e.g. if func=random.gauss, params={"mu": 0, "sigma": lambda x: 1+x/10}
+        """
         if inspect.isroutine(func):
             self.func = func
         else:
@@ -22,11 +35,25 @@ class StatFunc:
         
     
     def __call__(self, t):
+        """
+        get a random value at time t
+        """
         return self.func(**{k: f(t) for k, f in self.params.items()})
 
 
 class ARMA:
+    """
+    Class to generate ARMA(p, q) data
+    """
     def __init__(self, phi, theta, func):
+        """
+        Initiate the time series
+        
+        params:
+        phi - coefficient for AR, length is p+1
+        theta - coefficient for MA, length is q
+        func - a StatFunc, the noise term for the ARMA
+        """
         self.phi = phi
         self.p = len(phi) - 1
         self.old_r = deque([0]*self.p)
@@ -36,6 +63,9 @@ class ARMA:
         self.func = func  # noise, a StatFunc
     
     def __call__(self, t):
+        """
+        get a random value at time t
+        """
         a = self.func(t)
         r = self.phi[0] + a
         p = self.p
@@ -53,7 +83,20 @@ class ARMA:
         return r
 
 class TimeSeries:
+    """
+    Class to mix several distribution
+    """
     def __init__(self, stat_funcs, stat_probs, trend_func=lambda x: 0, season=0):
+        """
+        initiate the class
+        
+        params:
+        stat_funcs - a list of StatFunc to mix
+        stat_probs - a list of number, the probability of each StatFunc, 
+                     sum of them must be non-zero
+        trend_func - a function for global trend
+        season - a number for the season, 0 means there is no seasonal property
+        """
         assert len(stat_funcs) == len(stat_probs), "prob num and function num not match"
         self.stat_funcs = stat_funcs
         self.stat_probs = stat_probs
@@ -69,8 +112,14 @@ class TimeSeries:
         
         self.t = 0
     
-    def next(self):
-        self.t += 1
+    def next(self, add=1):
+        """
+        increase the current time and generate the value
+        
+        returns:
+        current time, value generated, index of the StatFunc used for this value
+        """
+        self.t += add
         t = self.t
         if self.season != 0:
             t %= self.season

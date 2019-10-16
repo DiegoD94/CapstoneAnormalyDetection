@@ -1,3 +1,8 @@
+"""
+code for testing the data genrating library
+the code is for capstone project in Data Science Institute, 2019
+author: zhuzilin, zhuzilinallen@gmail.com
+"""
 from time_series import StatFunc, ARMA, TimeSeries
 import random
 import matplotlib.pyplot as plt
