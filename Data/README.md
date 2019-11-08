@@ -3,6 +3,7 @@ Dataset: ydata-labeled-time-series-anomalies-v1_0
 Yahoo! Synthetic and real time-series with labeled anomalies, version 1.0
 
 =====================================================================
+
 This dataset is provided as part of the Yahoo! Webscope program, to be
 used for approved non-commercial research purposes by recipients who 
 have signed a Data Sharing Agreement with Yahoo!. This dataset is not
