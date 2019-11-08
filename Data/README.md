@@ -29,6 +29,7 @@ and geos removed. Fields in each data file are delimited with (",") characters.
 The content of the six files are as follows:
 
 =====================================================================
+
 (1) "A[1-2]Benchmark/[real,synthetic]_(int).csv" contains real and synthetic time-series with labeled anomalies. The synthetic data set contains time-series with random seasonality, trend and noise. The outliers in the  synthetic dataset are inserted at random positions. Note that the timestamps of the A1Benchmark are replaced by  integers with the increment of 1, where each data-point represents 1 hour worth of data. The anomalies in A1Benchmark  are marked by humans and therefore may not be consistent, therefore during benchmarking A1Benchmark is best used to measure  recall.
 
     The fields are:
@@ -47,6 +48,7 @@ Snippet:
   5,45,1
 
 =====================================================================
+
 (2) "A[3-4]Benchmark/A[3-4]Benchmark-TS(int).csv" contain synthetic time-series.  The A3Benchmark only contains outliers while the A4Benchmark also contains the anomalies  that are marked as change-points. The synthetic time-series have varying noise and trends  with three pre-specified seasonalities. The anomalies in the synthetic time-series are inserted at random positions.
 
      The fields are:
