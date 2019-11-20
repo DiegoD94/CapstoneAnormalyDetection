@@ -38,6 +38,20 @@ for t in range(T):
         m_Z[i].append(Z_t[i])
         m_Y[i].append(Y_t[i])
 
+# a sample window slide algorithm
+win_size = 5
+thres = 4
+wins = [0]*N
+m_pred = [[] for _ in range(N)]
+for t in range(T):
+    for i in range(N):
+        wins[i] += m_Y[i][t]
+    if t > win_size:
+        for i in range(N):
+            wins[i] -= m_Y[i][t-win_size]
+    for i in range(N):
+        m_pred[i].append(int(wins[i] > thres))
+
 # a sample for generated data
 for i in range(N):
     print(label[i])
@@ -46,6 +60,9 @@ for i in range(N):
     print()
     for j in range(T):
         print(m_Y[i][j], end='')
+    print()
+    for j in range(T):
+        print(m_pred[i][j], end='')
     print()
 
 
