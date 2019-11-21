@@ -82,6 +82,27 @@ class ARMA:
         self.old_a.append(a)
         return r
 
+class HMM:
+    def __init__(self, start, m_hidden, m_observe):
+        """
+        initiate the class
+        """
+        assert(len(m_hidden) > 0)
+        assert(len(m_hidden) == len(m_hidden[0]))
+        assert(len(m_observe) > 0)
+        assert(len(m_observe) == len(m_observe[0]))
+        self.state = start
+        self.m_hidden = m_hidden
+        self.m_observe = m_observe
+        self.n_hidden = len(m_observe)
+        self.n_observe = len(m_observe[0])
+    
+    def next(self):
+        state = self.state
+        observe = random.choices(range(self.n_observe), weights=self.m_observe[state])[0]
+        self.state = random.choices(range(self.n_hidden), weights=self.m_hidden[state])[0]
+        return state, observe
+
 class TimeSeries:
     """
     Class to mix several distribution
