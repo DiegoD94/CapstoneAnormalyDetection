@@ -4,14 +4,16 @@ from hmmlearn.hmm import MultinomialHMM
 from functools import reduce
 import numpy as np
 
+T = 60
+N = 10000
+m_Z, m_Y = generate_raw_data(T, N)
+
 ####################################################
 # hmm predict
 ####################################################
+"""
 print("--------------------------------------------")
 print("HMM:")
-T = 60
-N = 100
-m_Z, m_Y = generate_raw_data(T, N)
 def preprocess_data_hmm(Y):
     data = np.concatenate([np.reshape(y, (-1, 1)) for y in Y])
     lengths = [len(y) for y in Y]
@@ -55,15 +57,16 @@ print("precision: ")
 print(TP / (TP + FP))
 print("recall: ")
 print((TP) / (TP + FN))
-
+"""
 ####################################################
 # logistic regression
 ####################################################
 print("--------------------------------------------")
 print("LR:")
 # create windows data
-win_size = 5
-train_data, train_label, test_data, test_label = generate_win_data(m_Z, m_Y, win_size)
+win_size = 15
+future = 1
+train_data, train_label, test_data, test_label = generate_win_data(m_Z, m_Y, win_size, future)
 lr = LogisticRegression(class_weight="balanced")
 lr.fit(train_data, train_label)
 
