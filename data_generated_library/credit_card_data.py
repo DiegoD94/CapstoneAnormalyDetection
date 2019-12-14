@@ -3,12 +3,15 @@ from time_series import HMM
 
 np.set_printoptions(precision=2)
 
+######################################################
+# using HMM
+######################################################
 GOOD = 0
 STRUGGLE = 1
 BAD = 2
 
 ALL = 0
-INTEREST = 1
+MINIMUM = 1
 NOTHING = 2
 
 # standard matrix
@@ -18,7 +21,7 @@ m_hidden = [[0.89, 0.1, 0.01],  # good
             [0, 0, 1]  # bad
            ]
 
-# pay all, pay interest, pay nothing
+# pay all, pay MINIMUM, pay nothing
 m_observe = [[0.99, 0.01, 0],  # good
              [0.5, 0.5, 0],  # struggle
              [0, 0.2, 0.8]  # bad
@@ -119,3 +122,72 @@ def generate_win_data(m_Z, m_Y, win_size, future):
             if m_Z[i][t+win_size] == 2:
                 break
     return train_data, train_label, test_data, test_label
+
+#######################################################
+# with income hidden variable
+######################################################
+def generate_hyperparams():
+    mu = np.random.normal(loc=2000, scale=2000)
+    alpha = np.random.beta(1, 1)
+    sigma = np.random.gamma(shape=4, scale=250)  # mean=1000, std=500
+    return mu, alpha, sigma
+
+def generate_raw_data_with_income(T, N, B_max=10000, func=generate_hyperparams):
+    m_Z = []
+    m_Y = []
+    m_B = []
+    m_D = []
+    for _ in range(N):
+        mu, alpha, sigma = func()
+        d = np.random.normal(loc=mu, scale=sigma)
+        b = 0
+        Z = []
+        Y = []
+        B = []
+        D = []
+        for _ in range(T):
+            d = np.random.normal(loc=d, scale=sigma) - alpha*(d-mu)
+            b = min(max(b-d, 0), B_max)
+            z = GOOD
+            if b > 0 and d > 0:
+                z = STRUGGLE
+            elif b > 0 and d < 0:
+                z = BAD
+            y = ALL
+            if b > 0:
+                if abs(b - B_max) < 1e-6:
+                    y = NOTHING
+                else:
+                    y = MINIMUM
+            Z.append(z)
+            Y.append(y)
+            B.append(b)
+            D.append(d)
+        # print
+        m_Z.append(Z)
+        m_Y.append(Y)
+        m_B.append(B)
+        m_D.append(D)
+    return m_Z, m_Y, m_B, m_D
+
+def generate_win_data_with_income(m_Z, m_Y, win_size):
+    assert(len(m_Z) > 0)
+    N = len(m_Z)
+    T = len(m_Z[0])
+
+    train_data = []
+    train_label = []
+    for i in range(int(0.8*N)):
+        for t in range(T-win_size):
+            train_data.append(m_Y[i][t:t+win_size])
+            train_label.append(m_Z[i][t+win_size])
+
+    test_data = []
+    test_label = []
+    for i in range(int(0.8*N), N):
+        for t in range(T-win_size):
+            test_data.append(m_Y[i][t:t+win_size])
+            test_label.append(m_Z[i][t+win_size])
+    return train_data, train_label, test_data, test_label
+
+
